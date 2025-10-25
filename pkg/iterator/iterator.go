@@ -7,17 +7,17 @@ import (
 type IteratorType int
 
 const (
-	// SkipListIteratorType for skip list iterators
+	// SkipListIteratorType  用于跳表迭代器
 	SkipListIteratorType IteratorType = iota
-	// SSTIteratorType for SST iterators
+	// SSTIteratorType for SST 迭代器
 	SSTIteratorType
-	// HeapIteratorType for heap-based merge iterators
+	// HeapIteratorType for 基于堆的合并迭代器
 	HeapIteratorType
-	// MergeIteratorType for general merge iterators
+	// MergeIteratorType for 通用合并迭代器
 	MergeIteratorType
-	// SelectIteratorType for select iterators
+	// SelectIteratorType for 选择迭代器
 	SelectIteratorType
-	// ConcatIteratorType for concat iterators
+	// ConcatIteratorType for 连接迭代器
 	ConcatIteratorType
 )
 
@@ -85,17 +85,18 @@ func NewEmptyIterator() *EmptyIterator {
 	return &EmptyIterator{closed: false}
 }
 
-func (e *EmptyIterator) Valid() bool           { return false }
-func (e *EmptyIterator) Key() string           { return "" }
-func (e *EmptyIterator) Value() string         { return "" }
-func (e *EmptyIterator) TxnID() uint64         { return 0 }
-func (e *EmptyIterator) IsDeleted() bool       { return false }
-func (e *EmptyIterator) Next()                 {}
-func (e *EmptyIterator) Seek(key string) bool  { return false }
-func (e *EmptyIterator) SeekToFirst()          {}
-func (e *EmptyIterator) SeekToLast()           {}
-func (e *EmptyIterator) GetType() IteratorType { return SkipListIteratorType }
-func (e *EmptyIterator) Close()                { e.closed = true }
+func (e *EmptyIterator) Valid() bool          { return false }
+func (e *EmptyIterator) Key() string          { return "" }
+func (e *EmptyIterator) Value() string        { return "" }
+func (e *EmptyIterator) TxnID() uint64        { return 0 }
+func (e *EmptyIterator) IsDeleted() bool      { return false }
+func (e *EmptyIterator) Next()                {}
+func (e *EmptyIterator) Seek(key string) bool { return false }
+func (e *EmptyIterator) SeekToFirst()         {}
+func (e *EmptyIterator) SeekToLast()          {}
+
+// Close func (e *EmptyIterator) GetType() IteratorType { return SkipListqIteratorType }
+func (e *EmptyIterator) Close() { e.closed = true }
 
 func (e *EmptyIterator) Entry() Entry {
 	return Entry{}
@@ -114,15 +115,15 @@ func CompareKeys(a, b string) int {
 
 // CompareEntries 首先按键比较两个条目，然后按交易 ID 比较（先比较较高的交易 ID）
 func CompareEntries(a, b Entry) int {
-	cmp := CompareKeys(a.Key, b.Key)
+	cmp := CompareKeys(a.Key, b.Key) // 比较key字典序
 	if cmp != 0 {
 		return cmp
-	}
+	} // 相同返回
 
 	if a.TxnID == 0 || b.TxnID == 0 {
 		return cmp
 	}
-	// Same key, higher transaction ID has priority (comes first)相同密钥，交易 ID 越高，优先级越高（先到）
+	// Same key, higher transaction ID has priority (comes first) 相同密钥，交易 ID 越高，优先级越高（先到）
 	if a.TxnID > b.TxnID {
 		return -1
 	}
