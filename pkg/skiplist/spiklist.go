@@ -99,7 +99,78 @@ func (sl *SkipList) Put(key, value string, txnID uint64) {
 	sl.sizeBytes += len(key) + len(value) + 8 // approximate size calculation
 }
 
-// Get 查找给定交易可见的密钥的最新版本
+// Get 查找给定交易可见的密钥的最新版本(给一个迭代器)
 func (sl *SkipList) Get(key string, txnID uint64) *SkipListIterator {
+	current := sl.header
 
+	// 找到新的key
+	tempNode := NewNode(key, "", txnID, 1)
+	for i := sl.level - 1; i >= 0; i-- {
+		for current.forward[i] != nil && current.forward[i].CompareNode(tempNode) < 0 {
+			current = current.forward[i]
+		}
+	}
+
+	current = current.forward[0]
+
+	// 查找此transaction可见的第一个版本
+	for current != nil && current.Key() == key {
+		if txnID == 0 || current.TxnID() <= txnID {
+			//
+			iter := NewSkipListIterator(current, sl)
+			iter.SetTxnID(txnID)
+			return iter
+		}
+		current = current.forward[0]
+	}
+	// Key not found or no visible version （如果没有找到这个key）
+	iter := NewSkipListIterator(nil, sl)
+	iter.SetTxnID(txnID)
+	return iter
+}
+
+// Size returns the number of entries in the skip list
+func (sl *SkipList) Size() int {
+	return sl.size
+}
+
+// SizeBytes returns the approximate memory usage in bytes
+func (sl *SkipList) SizeBytes() int {
+
+	return sl.sizeBytes
+}
+
+// IsEmpty 如果跳过列表为空，则返回 true
+func (sl *SkipList) IsEmpty() bool {
+	return sl.size == 0
+}
+
+// Clear removes all entries from the skip list
+func (sl *SkipList) Clear() {
+	sl.header = NewNode("", "", 0, MaxLevel)
+	sl.level = 1
+	sl.size = 0
+	sl.sizeBytes = 0
+}
+
+// NewIterator 为跳过列表创建一个新的迭代器
+func (sl *SkipList) NewIterator(txnID uint64) iterator.Iterator {
+
+	iter := NewSkipListIterator(sl.header.forward[0], sl)
+	iter.SetTxnID(txnID)
+	return iter
+}
+
+// Flush 将跳过列表中的所有条目作为切片返回
+func (sl *SkipList) Flush() []iterator.Entry {
+
+	entries := make([]iterator.Entry, 0, sl.size)
+	current := sl.header.forward[0]
+
+	for current != nil {
+		entries = append(entries, current.Entry())
+		current = current.forward[0]
+	}
+
+	return entries
 }
