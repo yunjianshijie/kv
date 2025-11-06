@@ -153,7 +153,7 @@ func (sl *SkipList) Clear() {
 	sl.sizeBytes = 0
 }
 
-// NewIterator 为跳过列表创建一个新的迭代器
+// NewIterator 为跳表创建一个新的迭代器
 func (sl *SkipList) NewIterator(txnID uint64) iterator.Iterator {
 
 	iter := NewSkipListIterator(sl.header.forward[0], sl)
@@ -161,7 +161,7 @@ func (sl *SkipList) NewIterator(txnID uint64) iterator.Iterator {
 	return iter
 }
 
-// Flush 将跳过列表中的所有条目作为切片返回
+// Flush 将跳过列表中的所有条目作为切片返回    将跳表中存储的所有键值对（及元信息）提取为一个有序的条目切片
 func (sl *SkipList) Flush() []iterator.Entry {
 
 	entries := make([]iterator.Entry, 0, sl.size)

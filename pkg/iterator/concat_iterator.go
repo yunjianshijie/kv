@@ -8,23 +8,23 @@ type ConcatIterator struct {
 }
 
 // NewConcatIterator creates a new concat iterator
-func NewConcatIterator(iterators []Iterator) Iterator {
-	if len(iterators) == 0 {
-		return NewEmptyIterator()
-	}
-
-	if len(iterators) == 1 {
-		return iterators[0]
-	}
-
-	ci := &ConcatIterator{
-		iterators: iterators,
-		current:   -1,
-		closed:    false,
-	}
-
-	return ci
-}
+//func NewConcatIterator(iterators []Iterator) Iterator {
+//	if len(iterators) == 0 {
+//		return NewEmptyIterator()
+//	}
+//
+//	if len(iterators) == 1 {
+//		return iterators[0]
+//	}
+//
+//	ci := &ConcatIterator{
+//		iterators: iterators,
+//		current:   -1,
+//		closed:    false,
+//	}
+//
+//	return ci
+//}
 
 // Valid returns true if the iterator is pointing to a valid entry
 func (ci *ConcatIterator) Valid() bool {
